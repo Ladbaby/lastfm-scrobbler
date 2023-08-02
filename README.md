@@ -33,22 +33,19 @@ playerctl --list-all
 
 ## Installation
 
+The package is now available via PyPI
+
 ```bash
-pip install -r requirements.txt
+pip install lastfm-mpris2-scrobbler
 ```
 
 ## Configurations
 
-```bash
-cp config.yaml.example config.yaml
-vim config.yaml
-```
-
-details can be found in the config file
+The program expect a `config.yaml` file, example and detailed information can be found in `config.yaml.example`
 
 ## Usage
 
 ```bash
-python main.py config.yaml
+lastfm-mpris2-scrobbler PATH_TO_YOUR_CONFIG/config.yaml
 ```
 

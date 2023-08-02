@@ -113,7 +113,7 @@ class Scrobbler:
 
 @click.command()
 @click.argument("config_file")
-def run(config_file):
+def main(config_file):
     from dbus.mainloop.glib import DBusGMainLoop
     import yaml
 
@@ -131,4 +131,4 @@ def run(config_file):
         time.sleep(5)
 
 if __name__ == "__main__":
-    run()
+    main()
