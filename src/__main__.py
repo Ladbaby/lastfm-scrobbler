@@ -19,7 +19,7 @@ class PlayerState:
         self.update_status(metadata_dict, playback_status, self.last_observation_timestamp)
 
     def handle_multiple_artists(self, artist_array):
-        # trying to convert artist array into a single string
+        # convert artist array into a single string
         return ", ".join(artist_array)
     
     def update_status(self, metadata_dict, playback_status, timestamp):
@@ -56,6 +56,7 @@ class Scrobbler:
 
         self.player_dict = {}
 
+        # TODO: handle network error
         self.network = pylast.LastFMNetwork(
             api_key=kwargs["api_key"],
             api_secret=kwargs["api_secret"],
@@ -88,6 +89,14 @@ class Scrobbler:
 
     def scrobble_all_players(self):
         for uri, player_obj in self.player_dict.items():
+            if player_obj.playback_status == "Playing":
+                self.network.update_now_playing(
+                    artist=player_obj.artist,
+                    title=player_obj.title,
+                    album=player_obj.album,
+                    album_artist=player_obj.albumArtist,
+                    track_number=player_obj.trackNumber,
+                )
             if player_obj.total_played_time >= min(self.scrobble_time_threshold, int(player_obj.length / 2)) and not player_obj.if_scrobbled:
                 self.network.scrobble(
                     artist=player_obj.artist, 
@@ -111,6 +120,9 @@ class Scrobbler:
                 # self.logger.debug("scrobble condition unmet")
                 pass
 
+    def update_now_playing(self):
+        pass
+
 @click.command()
 @click.argument("config_file")
 def main(config_file):
@@ -126,8 +138,11 @@ def main(config_file):
     scrobbler = Scrobbler(**config)
 
     while True:
-        scrobbler.connect_to_all_players()
-        scrobbler.scrobble_all_players()
+        try: 
+            scrobbler.connect_to_all_players()
+            scrobbler.scrobble_all_players()
+        except Exception as e:
+            pass
         time.sleep(5)
 
 if __name__ == "__main__":
