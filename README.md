@@ -10,7 +10,7 @@ Modified based on [dbus-scrobbler](https://github.com/spezifisch/dbus-scrobbler)
 
     - played for 4 mins
     - played for half the length
-- [ ] scrobble now playing status
+- [x] update now playing status
 - [ ] offline storage support
 
 ## Alternatives
