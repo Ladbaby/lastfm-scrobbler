@@ -1,3 +1,6 @@
 .vscode/*
 config.yaml
 test.sh
+build/*
+dist/*
+lastfm_mpris2_scrobbler.egg-info/*
