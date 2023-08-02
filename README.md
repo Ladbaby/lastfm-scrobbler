@@ -6,12 +6,12 @@ Modified based on [dbus-scrobbler](https://github.com/spezifisch/dbus-scrobbler)
 
 ## Features
 
-- [*] scrobble music to Last.fm if one of the conditions are met:
+- [x] scrobble music to Last.fm if one of the conditions are met:
 
     - played for 4 mins
     - played for half the length
-- [] scrobble now playing status
-- [] offline storage support
+- [ ] scrobble now playing status
+- [ ] offline storage support
 
 ## Alternatives
 
