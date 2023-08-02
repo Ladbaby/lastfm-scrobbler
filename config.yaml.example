@@ -1,0 +1,13 @@
+# username for that service
+user_name: foo
+
+# md5 hash of your password (obtained via `echo -n password | md5sum`)
+password_hash: abc123492abccf4f1997f7ccaabc123b
+
+# last.fm api, which can be created via https://www.last.fm/api/account/create
+api_key: 11111111111111111111111111111111
+api_secret: 11111111111111111111111111111111
+
+# the app's uri you want to scrobble
+application_whitelist: [ "org.mpris.MediaPlayer2.harmonoid" ]
+
