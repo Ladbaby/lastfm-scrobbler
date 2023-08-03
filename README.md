@@ -25,27 +25,55 @@ Also, although [rescrobbled](https://github.com/InputUsername/rescrobbled) may a
 
 Thus, this scrobbler is a general-purpose one under the Linux desktop environment, supporting scrobble music from media players without a built-in Last.fm scrobbling feature.
 
-Check if your media player supports MPRIS2 via [playerctl](https://github.com/altdesktop/playerctl) (when it is running)
+Check if your media player supports MPRIS2 via (make sure the player is running):
 
 ```bash
-playerctl --list-all
+lastfm-mpris2-scrobbler --list-players
 ```
+
+The uri names of players will be shown
 
 ## Installation
 
-The package is now available via PyPI
+There're two options available now:
 
-```bash
-pip install lastfm-mpris2-scrobbler
-```
+- grab the stand-alone binary from [release page](https://github.com/Ladbaby/lastfm-scrobbler/releases)
+
+- or, via PyPI
+
+    ```bash
+    pip install lastfm-mpris2-scrobbler
+    ```
 
 ## Configurations
 
-The program expect a `config.yaml` file, example and detailed information can be found in `config.yaml.example`
+The program expects a `config.yaml` file, example and detailed information can be found in `config.yaml.example`:
+
+```yaml
+# username for that service
+user_name: foo
+
+# md5 hash of your password (obtained via `echo -n password | md5sum`)
+password_hash: abc123492abccf4f1997f7ccaabc123b
+
+# last.fm api, which can be created via https://www.last.fm/api/account/create
+api_key: 11111111111111111111111111111111
+api_secret: 11111111111111111111111111111111
+
+# the app's uri you want to scrobble
+# use `lastfm-mpris2-scrobbler --list-players` to check the uri name
+application_whitelist: [ "org.mpris.MediaPlayer2.harmonoid" ]
+```
 
 ## Usage
 
 ```bash
-lastfm-mpris2-scrobbler PATH_TO_YOUR_CONFIG/config.yaml
+lastfm-mpris2-scrobbler -c PATH_TO_YOUR_CONFIG/config.yaml
+```
+
+For more options, see:
+
+```bash
+lastfm-mpris2-scrobbler --help
 ```
 

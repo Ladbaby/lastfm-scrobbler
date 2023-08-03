@@ -3,4 +3,7 @@ config.yaml
 *.sh
 build/*
 dist/*
+dist_bin/*
 lastfm_mpris2_scrobbler.egg-info/*
+*.spec
+*/__pycache__/*
