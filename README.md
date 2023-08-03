@@ -1,4 +1,4 @@
-# Last.fm scrobbler
+﻿# 🎵 Last.fm scrobbler
 
 A Last.fm scrobbler via MPRIS2 in Linux, implemented via [pylast](https://github.com/pylast/pylast) and [mpris2](https://pythonhosted.org/mpris2/index.html)
 
