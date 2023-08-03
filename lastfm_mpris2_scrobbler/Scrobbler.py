@@ -2,8 +2,8 @@
 import pylast
 from mpris2 import get_players_uri, Player
 
-from globals import logger, get_unix_timestamp
-from PlayerState import PlayerState
+from lastfm_mpris2_scrobbler.globals import logger, get_unix_timestamp
+from lastfm_mpris2_scrobbler.PlayerState import PlayerState
 
 class Scrobbler:
     def __init__(self, **kwargs):

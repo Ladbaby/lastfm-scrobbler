@@ -8,7 +8,7 @@ import yaml
 from mpris2 import get_players_uri
 
 # from globals import logger
-from Scrobbler import Scrobbler
+from lastfm_mpris2_scrobbler.Scrobbler import Scrobbler
 
 
 # @click.command()

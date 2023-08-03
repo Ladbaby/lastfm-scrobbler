@@ -26,7 +26,7 @@ setup(
     tests_require=["pytest"],
     entry_points={
         "console_scripts": [
-            "lastfm-mpris2-scrobbler = src.__main__:main",
+            "lastfm-mpris2-scrobbler = lastfm_mpris2_scrobbler.__main__:main",
         ],
     },
     zip_safe=False,

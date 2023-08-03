@@ -1,4 +1,4 @@
-from globals import get_unix_timestamp
+from lastfm_mpris2_scrobbler.globals import get_unix_timestamp
 
 class PlayerState:
     def __init__(self, metadata_dict, playback_status) -> None:
