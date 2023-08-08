@@ -1,12 +1,24 @@
 from lastfm_mpris2_scrobbler.globals import get_unix_timestamp
 
 class PlayerState:
-    def __init__(self, metadata_dict, playback_status) -> None:
+    def __init__(self, metadata_dict = None, playback_status = "Playing") -> None:
         self.total_played_time = 0
         self.last_observation_timestamp = get_unix_timestamp()
         self.trackid = ""
         self.if_scrobbled = False
-        self.update_status(metadata_dict, playback_status, self.last_observation_timestamp)
+        if metadata_dict is not None:
+            self.update_status(metadata_dict, playback_status, self.last_observation_timestamp)
+
+    def set_value(self, trackid, artist, title, timestamp, album, album_artist, track_number, duration):
+        self.trackid = trackid
+        self.artist = artist
+        self.title = title
+        self.last_observation_timestamp = timestamp
+        self.album = album
+        self.albumArtist = album_artist
+        self.trackNumber = track_number
+        self.length = duration
+        return self
 
     def handle_multiple_artists(self, artist_array):
         # convert artist array into a single string

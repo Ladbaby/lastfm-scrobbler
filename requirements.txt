@@ -2,3 +2,4 @@ coloredlogs
 mpris2
 pylast
 PyYAML
+dbus-python

@@ -9,5 +9,8 @@ api_key: 11111111111111111111111111111111
 api_secret: 11111111111111111111111111111111
 
 # the app's uri you want to scrobble
+# use `lastfm-mpris2-scrobbler --list-players` to check the uri name
 application_whitelist: [ "org.mpris.MediaPlayer2.harmonoid" ]
 
+# app's log level
+log_level: DEBUG

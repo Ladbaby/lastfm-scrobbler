@@ -4,10 +4,13 @@ from mpris2 import get_players_uri, Player
 
 from lastfm_mpris2_scrobbler.globals import logger, get_unix_timestamp
 from lastfm_mpris2_scrobbler.PlayerState import PlayerState
+from lastfm_mpris2_scrobbler.Cache import Cache
+import coloredlogs
 
 class Scrobbler:
     def __init__(self, **kwargs):
         self.kwargs = kwargs
+        coloredlogs.install(level=kwargs["log_level"], logger=logger)
         self.player_dict = {}
 
         # TODO: handle network error
@@ -22,6 +25,9 @@ class Scrobbler:
 
         # scrobbler will upload if the track has been played for 4 mins or half the total length
         self.scrobble_time_threshold = 4 * 60
+
+        # offline cache
+        self.cache = Cache()
 
     def init_network(self):
         try:
@@ -52,43 +58,77 @@ class Scrobbler:
             del self.player_dict[uri]
 
     def scrobble_all_players(self):
-        if self.network is not None:
-            for uri, player_obj in self.player_dict.items():
-                if player_obj.playback_status == "Playing":
-                    try:
-                        self.network.update_now_playing(
-                            artist=player_obj.artist,
-                            title=player_obj.title,
-                            album=player_obj.album,
-                            album_artist=player_obj.albumArtist,
-                            track_number=player_obj.trackNumber,
-                        )
-                    except Exception as e:
-                        logger.error(f"Failed to report now playing status: {e=}")
-                if player_obj.total_played_time >= min(self.scrobble_time_threshold, int(player_obj.length / 2)) and not player_obj.if_scrobbled:
-                    try:
-                        self.network.scrobble(
-                            artist=player_obj.artist, 
-                            title=player_obj.title,
-                            timestamp=player_obj.last_observation_timestamp,
-                            album=player_obj.album,
-                            album_artist=player_obj.albumArtist,
-                            track_number=player_obj.trackNumber,
-                            duration=int(player_obj.length)
-                        )
-                    except Exception as e:
-                        logger.error(f"Failed to scrobble: {e=}")
-                    player_obj.if_scrobbled = True
-                    logger.debug("scrobbled track: " + player_obj.title)
-                    logger.debug("artist: " + player_obj.artist)
-                    logger.debug("timestamp: " + str(player_obj.last_observation_timestamp))
-                    logger.debug("album: " + player_obj.album)
-                    logger.debug("albumArtist: " + player_obj.albumArtist)
-                    logger.debug("trackNumber: " + str(player_obj.trackNumber))
-                    logger.debug("duration: " + str(int(player_obj.length)))
-                    logger.debug("played time: " + str(int(player_obj.total_played_time)))
-                else:
-                    logger.debug("scrobble condition unmet")
-                    pass
-        else:
+        if self.network is None:
             self.init_network()
+        scrobble_list = []
+        for uri, player_obj in self.player_dict.items():
+            if player_obj.playback_status == "Playing" and self.network is not None:
+                try:
+                    self.network.update_now_playing(
+                        artist=player_obj.artist,
+                        title=player_obj.title,
+                        album=player_obj.album,
+                        album_artist=player_obj.albumArtist,
+                        track_number=player_obj.trackNumber,
+                    )
+                except Exception as e:
+                    logger.error(f"Failed to report now playing status")
+            if player_obj.total_played_time >= min(self.scrobble_time_threshold, int(player_obj.length / 2)) and not player_obj.if_scrobbled:
+                scrobble_list.append(player_obj)
+                player_obj.if_scrobbled = True
+            else:
+                logger.debug("scrobble condition unmet")
+
+        if self.network is not None:
+            self.scrobble_list(scrobble_list, isCache=False)
+            # [(trackid, artist, title, timestamp, album, album_artist, track_number, duration), ...]
+            cache_list = self.cache.read_unscrobbled()
+            if cache_list is not None:
+                cache_list_converted = []
+                for cache in cache_list:
+                    cache_list_converted.append(PlayerState().set_value(
+                        trackid=cache[0],
+                        artist=cache[1],
+                        title=cache[2],
+                        timestamp=cache[3],
+                        album=cache[4],
+                        album_artist=cache[5],
+                        track_number=cache[6],
+                        duration=cache[7]
+                    ))
+                self.scrobble_list(cache_list_converted, isCache=True)
+        elif len(scrobble_list) > 0:
+            self.cache.write_unscrobbled(scrobble_list)
+            logger.debug("Fail to scrobble now. Write to cache")
+
+    def scrobble_list(self, obj_list, isCache = False):
+        if obj_list != None and len(obj_list) > 0:
+            dict_list = self.obj_list_to_dict_list(obj_list)
+            try:
+                self.network.scrobble_many(dict_list)
+                logger.info("scrobbled: " + str(dict_list))
+                if isCache:
+                    self.cache.remove_unscrobbled(obj_list)
+            except Exception as e:
+                if not isCache:
+                    self.cache.write_unscrobbled(obj_list)
+                    logger.debug("Fail to scrobble now. Write to cache")
+                else:
+                    logger.debug("Fail to scrobble cached record now")
+                    pass
+
+    def obj_list_to_dict_list(self, obj_list):
+        dict_list = []
+        for obj in obj_list:
+            dict_list.append(
+                {
+                    "artist": obj.artist,
+                    "title": obj.title,
+                    "timestamp": obj.last_observation_timestamp,
+                    "album": obj.album,
+                    "album_artist": obj.albumArtist,
+                    "track_number": obj.trackNumber,
+                    "duration": obj.length,
+                }
+            )
+        return dict_list
