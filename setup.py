@@ -7,7 +7,7 @@ with open(path.join(root, "README.md"), encoding="utf-8") as f:
 
 setup(
     name='lastfm-mpris2-scrobbler',
-    version='1.0.0',
+    version='1.0.1',
     description="Last.fm scrobbler via MPRIS2 in Linux",
     url="https://github.com/Ladbaby/lastfm-scrobbler",
     author="Ladbaby",

@@ -66,7 +66,7 @@ class Scrobbler:
                 try:
                     self.network.update_now_playing(
                         artist=player_obj.artist,
-                        title=player_obj.title,
+                        title=self.fix_title(player_obj.title),
                         album=player_obj.album,
                         album_artist=player_obj.albumArtist,
                         track_number=player_obj.trackNumber,
@@ -123,7 +123,7 @@ class Scrobbler:
             dict_list.append(
                 {
                     "artist": obj.artist,
-                    "title": obj.title,
+                    "title": self.fix_title(obj.title),
                     "timestamp": obj.last_observation_timestamp,
                     "album": obj.album,
                     "album_artist": obj.albumArtist,
@@ -132,3 +132,9 @@ class Scrobbler:
                 }
             )
         return dict_list
+    
+    def fix_title(self, title):
+        if title.endswith(".mp3"):
+            return title[:-4]
+        else:
+            return title
