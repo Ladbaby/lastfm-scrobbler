@@ -111,3 +111,15 @@ systemctl --user enable scrobbler.service
 If you'd like a scrobbler similar to this, there're some choices. I recommand taking a look at [scrobblez](https://github.com/YodaEmbedding/scrobblez). It additionally provides Spotify related improvement, but doesn't provide stand-alone binary build for installation.
 
 Also, although [rescrobbled](https://github.com/InputUsername/rescrobbled) may also work, in my case it raised "Dbus error: argument type mismatch".
+
+## Known Issues
+
+- ~~If the music title contains unwanted substring (like `.mp3`), then Last.fm won't accept the scrobble~~
+
+    The program can now remove some of the unwanted substrings, including:
+
+    - `.mp3`
+    - `.ogg`
+    - `.wav`
+    - `.acc`
+    - `.flac`

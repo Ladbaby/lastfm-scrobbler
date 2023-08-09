@@ -134,7 +134,14 @@ class Scrobbler:
         return dict_list
     
     def fix_title(self, title):
-        if title.endswith(".mp3"):
-            return title[:-4]
-        else:
-            return title
+        audio_formats = [
+            '.mp3', 
+            '.ogg', 
+            '.wav', 
+            '.aac', 
+            '.flac'
+        ]
+        for format in audio_formats:
+            if title.endswith(format):
+                return title[:-(len(format))]
+        return title
