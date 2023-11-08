@@ -7,7 +7,7 @@ with open(path.join(root, "README.md"), encoding="utf-8") as f:
 
 setup(
     name='lastfm-mpris2-scrobbler',
-    version='1.0.1',
+    version='1.0.2',
     description="Last.fm scrobbler via MPRIS2 in Linux",
     url="https://github.com/Ladbaby/lastfm-scrobbler",
     author="Ladbaby",
@@ -22,6 +22,7 @@ setup(
         "pylast",
         "PyYAML",
         "dbus-python",
+        "pyxdg",
     ],
     tests_require=["pytest"],
     entry_points={
