@@ -59,6 +59,8 @@ api_secret: 11111111111111111111111111111111
 # the app's uri you want to scrobble
 # use `lastfm-mpris2-scrobbler --list-players` to check the uri name
 application_whitelist: [ "org.mpris.MediaPlayer2.harmonoid" ]
+# by default, scrobbler will upload if the track has been played for 4 * 60 seconds or half the total length
+scrobble_time_threshold: 240
 
 # app's log level
 log_level: DEBUG
