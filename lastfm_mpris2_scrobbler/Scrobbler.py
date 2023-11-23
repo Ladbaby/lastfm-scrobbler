@@ -24,7 +24,7 @@ class Scrobbler:
             self.now_playing_tracks_dict[app] = ""
 
         # scrobbler will upload if the track has been played for 4 mins or half the total length
-        self.scrobble_time_threshold = 4 * 60
+        self.scrobble_time_threshold = int(kwargs["scrobble_time_threshold"])
 
         # offline cache
         self.cache = Cache()
