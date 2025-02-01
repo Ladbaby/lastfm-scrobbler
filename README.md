@@ -29,6 +29,8 @@ The uri names of players will be shown
 
 ## Installation
 
+Prerequisite libraries: libglib2.0-dev and libdbus-1-dev, as mentioned in [this issue](https://github.com/Ladbaby/lastfm-scrobbler/issues/6#issuecomment-2620915466)
+
 There're two options available now:
 
 - grab the stand-alone binary from [release page](https://github.com/Ladbaby/lastfm-scrobbler/releases)
