@@ -11,7 +11,7 @@ class Scrobbler:
     def __init__(self, **kwargs):
         self.kwargs = kwargs
         coloredlogs.install(level=kwargs["log_level"], logger=logger)
-        self.player_dict = {}
+        self.player_dict: dict[str, PlayerState] = {} # key: player_uri
 
         # TODO: handle network error
         self.network = None
