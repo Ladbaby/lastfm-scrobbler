@@ -26,6 +26,14 @@ class PlayerState:
         return ", ".join(artist_array)
     
     def update_status(self, metadata_dict, playback_status, timestamp):
+        # reset status if the track change
+        # some players won't update trackid, so we use the title as an additional condition
+        if self.trackid == self.get_value_from_dict(metadata_dict, "mpris:trackid") and self.title == self.get_value_from_dict(metadata_dict, "xesam:title"):
+            self.total_played_time += (timestamp - self.last_observation_timestamp) if playback_status == "Playing" else 0
+        else:
+            self.total_played_time = 0
+            self.if_scrobbled = False
+
         # time length of the current song in seconds
         self.length = int(self.get_value_from_dict(metadata_dict, "mpris:length", expect_type="int") / 1000000)
         # image file path
@@ -42,14 +50,8 @@ class PlayerState:
         self.url = self.get_value_from_dict(metadata_dict, "xesam:url")
         if self.url == "":
             self.url = "/"
-
-        # record the timestamp of last observation
-        if self.trackid == self.get_value_from_dict(metadata_dict, "mpris:trackid"):
-            self.total_played_time += (timestamp - self.last_observation_timestamp) if playback_status == "Playing" else 0
-        else:
-            self.total_played_time = 0
-            self.if_scrobbled = False
         self.trackid = self.get_value_from_dict(metadata_dict, "mpris:trackid")
+        # record the timestamp of last observation
         self.last_observation_timestamp = timestamp
 
         # record the playback status in observation
