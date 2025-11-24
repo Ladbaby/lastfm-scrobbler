@@ -1,6 +1,6 @@
-
 import pylast
 from mpris2 import get_players_uri, Player
+import fnmatch
 
 from lastfm_mpris2_scrobbler.globals import logger, get_unix_timestamp
 from lastfm_mpris2_scrobbler.PlayerState import PlayerState
@@ -17,11 +17,8 @@ class Scrobbler:
         self.network = None
         self.init_network()
             
+        # supports wildcard, see matches_whitelist() below
         self.application_whitelist = kwargs["application_whitelist"]
-
-        self.now_playing_tracks_dict = {}
-        for app in self.application_whitelist:
-            self.now_playing_tracks_dict[app] = ""
 
         # scrobbler will upload if the track has been played for 4 mins or half the total length
         self.scrobble_time_threshold = int(kwargs["scrobble_time_threshold"])
@@ -43,11 +40,18 @@ class Scrobbler:
             logger.debug(f"LastFMNetwork initialization failed: {e=}")
             logger.warning("Running in OFFLINE mode")
 
+    def matches_whitelist(self, uri):
+        """Check if URI matches any pattern in the whitelist."""
+        for pattern in self.application_whitelist:
+            if fnmatch.fnmatch(uri, pattern):
+                return True
+        return False
+
     def connect_to_all_players(self):
         last_observation_uri_list = list(self.player_dict)
         for uri in get_players_uri():
             uri = str(uri)
-            if uri in self.application_whitelist:
+            if self.matches_whitelist(uri):
                 p = Player(dbus_interface_info={'dbus_uri': uri})
                 if uri in self.player_dict.keys():
                     self.player_dict[uri].update_status(p.Metadata, p.PlaybackStatus, get_unix_timestamp())
