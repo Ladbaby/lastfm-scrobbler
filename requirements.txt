@@ -3,3 +3,4 @@ mpris2
 pylast
 PyYAML
 dbus-python
+pyxdg
