@@ -6,6 +6,7 @@ class PlayerState:
         self.total_played_time = 0
         self.last_observation_timestamp = get_unix_timestamp()
         self.trackid = ""
+        self.title = ""
         self.if_scrobbled = False
         if metadata_dict is not None:
             self.update_status(metadata_dict, playback_status, self.last_observation_timestamp)
