@@ -1,21 +1,14 @@
+import argparse
 import time
 from pathlib import Path
-import argparse
 
-# import click
-# from dbus.mainloop.glib import DBusGMainLoop
 import yaml
 from mpris2 import get_players_uri
 
-# from globals import logger
 from lastfm_mpris2_scrobbler.Scrobbler import Scrobbler
 
 
-# @click.command()
-# @click.argument("config_file")
-# def main(config_file):
 def main():
-    # dbus_loop = DBusGMainLoop(set_as_default=True)
     parser = argparse.ArgumentParser(
         prog='lastfm-mpris2-scrobbler',
         description='Last.fm scrobbler for Linux'
