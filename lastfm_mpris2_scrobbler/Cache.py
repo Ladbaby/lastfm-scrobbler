@@ -3,6 +3,7 @@ import sqlite3
 from xdg.BaseDirectory import xdg_cache_home
 
 from lastfm_mpris2_scrobbler.globals import logger
+from lastfm_mpris2_scrobbler.PlayerState import PlayerState
 
 class Cache:
     def __init__(self) -> None:
@@ -43,7 +44,7 @@ class Cache:
             logger.error(e)
             return None
         
-    def write_unscrobbled(self, unscrobbled_list):
+    def write_unscrobbled(self, unscrobbled_list: list[PlayerState]):
         try:
             for record in unscrobbled_list:
                 self.db_cache_cursor.execute('''
@@ -54,7 +55,7 @@ class Cache:
         except Exception as e:
             logger.error(e)
 
-    def remove_unscrobbled(self, remove_list):
+    def remove_unscrobbled(self, remove_list: list[PlayerState]):
         try:
             for record in remove_list:
                 self.db_cache_cursor.execute('''
