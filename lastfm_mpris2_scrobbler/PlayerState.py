@@ -1,65 +1,90 @@
-from lastfm_mpris2_scrobbler.globals import get_unix_timestamp
-from lastfm_mpris2_scrobbler.globals import logger
+from typing import Literal
+
+from lastfm_mpris2_scrobbler.globals import logger, get_unix_timestamp
 
 class PlayerState:
-    def __init__(self, metadata_dict = None, playback_status = "Playing") -> None:
-        self.total_played_time = 0
-        self.last_observation_timestamp = get_unix_timestamp()
-        self.trackid = ""
-        self.title = ""
-        self.if_scrobbled = False
+    def __init__(
+        self, 
+        metadata_dict: dict = None, 
+        playback_status: Literal["Playing", "Paused", "Stopped"] = "Playing"
+    ) -> None:
+        # initialize all data members with default values
+        self.if_scrobbled: bool = False
+        self.playback_status: str = playback_status # record the playback status in observation. Must be 'Playing', 'Paused' or 'Stopped'.
+        self.total_played_time: int = 0
+
+        self.album: str = ''
+        self.albumArtist: str = ''
+        self.artist: str = ''
+        self.artUrl: str = '' # image file path
+        self.discNumber: int = 1
+        self.firstUsed: str = ''
+        self.last_observation_timestamp: int = get_unix_timestamp() # record the timestamp of last observation
+        self.length: int = 1 # time length of the current song in seconds
+        self.title: str = ''
+        self.trackid: str = ''
+        self.trackNumber: int = 1
+        self.url: str = ''
+
         if metadata_dict is not None:
             self.update_status(metadata_dict, playback_status, self.last_observation_timestamp)
 
-    def set_value(self, trackid, artist, title, timestamp, album, album_artist, track_number, duration):
-        self.trackid = trackid
-        self.artist = artist
-        self.title = title
-        self.last_observation_timestamp = timestamp
+    def set_value(
+        self, 
+        album: str, 
+        album_artist: str, 
+        artist: str, 
+        duration: int,
+        timestamp: int, 
+        title: str, 
+        track_number: int, 
+        trackid: str
+    ):
         self.album = album
         self.albumArtist = album_artist
-        self.trackNumber = track_number
+        self.artist = artist
         self.length = duration
+        self.last_observation_timestamp = timestamp
+        self.title = title
+        self.trackNumber = track_number
+        self.trackid = trackid
         return self
-
-    def handle_multiple_artists(self, artist_array):
-        # convert artist array into a single string
-        return ", ".join(artist_array)
     
-    def update_status(self, metadata_dict, playback_status, timestamp):
+    def update_status(
+        self, 
+        metadata_dict: dict, 
+        playback_status: Literal["Playing", "Paused", "Stopped"], 
+        timestamp: int
+    ):
         # reset status if the track change
-        # some players won't update trackid, so we use the title as an additional condition
-        if self.trackid == self.get_value_from_dict(metadata_dict, "mpris:trackid") and self.title == self.get_value_from_dict(metadata_dict, "xesam:title"):
+        # some players won't update trackid, so we use the title and artist as an additional condition
+        if self.trackid == self._get_value_from_dict(metadata_dict, "mpris:trackid") and self.title == self._get_value_from_dict(metadata_dict, "xesam:title"):
             self.total_played_time += (timestamp - self.last_observation_timestamp) if playback_status == "Playing" else 0
         else:
             self.total_played_time = 0
             self.if_scrobbled = False
 
-        # time length of the current song in seconds
-        self.length = int(self.get_value_from_dict(metadata_dict, "mpris:length", expect_type="int") / 1000000)
-        # image file path
-        self.artUrl = self.get_value_from_dict(metadata_dict, "mpris:artUrl")
-        self.album = self.get_value_from_dict(metadata_dict, "xesam:album")
-        self.artist = self.handle_multiple_artists(self.get_value_from_dict(metadata_dict, "xesam:artist", expect_type="list"))
-        self.albumArtist = self.handle_multiple_artists(self.get_value_from_dict(metadata_dict, "xesam:albumArtist", expect_type="list"))
-        if self.albumArtist == "":
+        self.album = self._get_value_from_dict(metadata_dict, "xesam:album")
+        self.albumArtist = self._handle_multiple_artists(self._get_value_from_dict(metadata_dict, "xesam:albumArtist", expect_type="list"))
+        self.artist = self._handle_multiple_artists(self._get_value_from_dict(metadata_dict, "xesam:artist", expect_type="list"))
+        self.artUrl = self._get_value_from_dict(metadata_dict, "mpris:artUrl")
+        self.discNumber = self._get_value_from_dict(metadata_dict, "xesam:discNumber", expect_type="int")
+        self.firstUsed = self._get_value_from_dict(metadata_dict, "xesam:firstUsed")
+        self.last_observation_timestamp = timestamp
+        self.length = int(self._get_value_from_dict(metadata_dict, "mpris:length", expect_type="int") / 1000000)
+        self.playback_status = playback_status
+        self.title = self._get_value_from_dict(metadata_dict, "xesam:title")
+        self.trackid = self._get_value_from_dict(metadata_dict, "mpris:trackid")
+        self.trackNumber = self._get_value_from_dict(metadata_dict, "xesam:trackNumber", expect_type="int")
+        self.url = self._get_value_from_dict(metadata_dict, "xesam:url")
+
+        # Handle some special cases
+        if self.albumArtist in ["", []]:
             self.albumArtist = self.artist
-        self.discNumber = self.get_value_from_dict(metadata_dict, "xesam:discNumber", expect_type="int")
-        self.firstUsed = self.get_value_from_dict(metadata_dict, "xesam:firstUsed")
-        self.title = self.get_value_from_dict(metadata_dict, "xesam:title")
-        self.trackNumber = self.get_value_from_dict(metadata_dict, "xesam:trackNumber", expect_type="int")
-        self.url = self.get_value_from_dict(metadata_dict, "xesam:url")
         if self.url == "":
             self.url = "/"
-        self.trackid = self.get_value_from_dict(metadata_dict, "mpris:trackid")
-        # record the timestamp of last observation
-        self.last_observation_timestamp = timestamp
 
-        # record the playback status in observation
-        # May be 'Playing', 'Paused' or 'Stopped'.
-        self.playback_status = playback_status
-
-    def get_value_from_dict(self, dict: dict, key: str, expect_type: str = "str"):
+    def _get_value_from_dict(self, dict: dict, key: str, expect_type: str = "str"):
         try:
             value = dict[key]
             if expect_type == "str":
@@ -80,3 +105,7 @@ class PlayerState:
                 return []
             else:
                 logger.exception(f"Unexpected {expect_type=}")
+
+    def _handle_multiple_artists(self, artist_array: list[str]) -> str:
+        # convert artist array into a single string
+        return ", ".join(artist_array)
