@@ -58,7 +58,7 @@ class PlayerState:
     ):
         # reset status if the track change
         # some players won't update trackid, so we use the title and artist as an additional condition
-        if self.trackid == self._get_value_from_dict(metadata_dict, "mpris:trackid") and self.title == self._get_value_from_dict(metadata_dict, "xesam:title"):
+        if self.trackid == self._get_value_from_dict(metadata_dict, "mpris:trackid") and self.title == self._get_value_from_dict(metadata_dict, "xesam:title") and self.artist == self._handle_multiple_artists(self._get_value_from_dict(metadata_dict, "xesam:artist", expect_type="list")):
             self.total_played_time += (timestamp - self.last_observation_timestamp) if playback_status == "Playing" else 0
         else:
             self.total_played_time = 0
