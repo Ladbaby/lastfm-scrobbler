@@ -1,7 +1,8 @@
 import pylast
 from mpris2 import get_players_uri, Player
 import fnmatch
-from urllib import request, URLError
+from urllib import request
+from urllib.error import URLError
 from pathlib import Path
 from PIL import Image
 
