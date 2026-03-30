@@ -12,6 +12,7 @@ Modified based on [dbus-scrobbler](https://github.com/spezifisch/dbus-scrobbler)
     - played for half the length
 - [x] update now playing status
 - [x] offline scrobble cache support
+- [x] logging now playing details and album art to local files (to monitor in OBS, for example)
 
 ## What is MPRIS2?
 
