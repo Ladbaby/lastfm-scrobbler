@@ -96,8 +96,10 @@ class Scrobbler:
                         logger.debug("Unable to write the file at " + str(self.art_path) + " (" + e.strerror + ")")
                     except URLError as e:
                         logger.debug("Unable to load URL at " + player_obj.artUrl + " (" + e.strerror + ")")
+                    logger.info("Updated album art at " + str(self.art_path))
                 if self.txt_path:
                     self.txt_path.write_text(player_obj.artist + " - " + self._fix_title(player_obj.title))
+                    logger.info("Updated now playing file at " + str(self.txt_path))
             if player_obj.total_played_time >= min(self.scrobble_time_threshold, int(player_obj.length / 2)) and not player_obj.if_scrobbled:
                 scrobble_list.append(player_obj)
                 player_obj.if_scrobbled = True
