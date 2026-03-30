@@ -105,7 +105,7 @@ class Scrobbler:
                 if self.txt_path:
                     now_playing = player_obj.artist + " - " + self._fix_title(player_obj.title)
                     if self.last_txt != now_playing:
-                        self.txt_path.write_text()
+                        self.txt_path.write_text(now_playing)
                         self.last_txt = now_playing
                         logger.info("Updated now playing file at " + str(self.txt_path))
             if player_obj.total_played_time >= min(self.scrobble_time_threshold, int(player_obj.length / 2)) and not player_obj.if_scrobbled:
