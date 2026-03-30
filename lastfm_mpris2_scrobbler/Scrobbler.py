@@ -31,7 +31,6 @@ class Scrobbler:
         self.txt_path: Path | None = None
 
         # last seen now playing art URL and text file contents to avoid writing files with no new data
-        self.last_art: Image | None = None
         self.last_art_URL: str | None = None
         self.last_txt: str | None = None
 
@@ -102,10 +101,12 @@ class Scrobbler:
                     except URLError as e:
                         logger.debug("Unable to load URL at " + player_obj.artUrl + " (" + e.strerror + ")")
                     logger.info("Updated album art at " + str(self.art_path))
+                    self.last_art_URL = player_obj.artUrl
                 if self.txt_path:
                     now_playing = player_obj.artist + " - " + self._fix_title(player_obj.title)
                     if self.last_txt != now_playing:
                         self.txt_path.write_text()
+                        self.last_txt = now_playing
                         logger.info("Updated now playing file at " + str(self.txt_path))
             if player_obj.total_played_time >= min(self.scrobble_time_threshold, int(player_obj.length / 2)) and not player_obj.if_scrobbled:
                 scrobble_list.append(player_obj)
