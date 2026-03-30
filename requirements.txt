@@ -4,3 +4,4 @@ pylast
 PyYAML
 dbus-python
 pyxdg
+Pillow

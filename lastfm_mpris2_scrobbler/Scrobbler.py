@@ -1,6 +1,9 @@
 import pylast
 from mpris2 import get_players_uri, Player
 import fnmatch
+from urllib import request, URLError
+from pathlib import Path
+from PIL import Image
 
 from lastfm_mpris2_scrobbler.globals import logger, get_unix_timestamp
 from lastfm_mpris2_scrobbler.PlayerState import PlayerState
@@ -21,6 +24,34 @@ class Scrobbler:
 
         # scrobbler will upload if the track has been played for 4 mins or half the total length
         self.scrobble_time_threshold: int = int(kwargs["scrobble_time_threshold"])
+
+        # now playing art and text file to write, if specified
+        self.art_path: Path | None = None
+        self.txt_path: Path | None = None
+
+        base_dir = kwargs.get("now_playing_dir")
+        art_path = kwargs.get("now_playing_art")
+        txt_path = kwargs.get("now_playing_txt")
+        self.art_path = Path(art_path) if art_path else Path(base_dir, "now_playing.png") if base_dir else None
+        self.txt_path = Path(txt_path) if txt_path else Path(base_dir, "now_playing.txt") if base_dir else None
+        if base_dir and art_path and txt_path:
+            logger.debug("Specifying now_playing_dir and both now_playing_art and now_playing_txt will ignore now_playing_dir.")
+        try:
+            if self.art_path:
+                self.art_path.parent.mkdir(exist_ok=True, parents=True)
+            if self.txt_path:
+                self.txt_path.parent.mkdir(exist_ok=True, parents=True)
+        except FileExistsError:
+            if base_dir:
+                raise FileExistsError("The now_playing_dir specified in the config.yaml " + base_dir + " includes a part which exists and is not a directory")
+            elif art_path:
+                raise FileExistsError("The now_playing_art specified in the config.yaml " + art_path + " includes a part which exists and is not a directory")
+            elif txt_path:
+                raise FileExistsError("The now_playing_txt specified in the config.yaml " + txt_path + " includes a part which exists and is not a directory")
+        if self.art_path:
+            self.art_path.touch()
+        if self.txt_path:
+            self.txt_path.touch()
 
         # offline cache
         self.cache = Cache()
@@ -55,6 +86,17 @@ class Scrobbler:
                     )
                 except Exception as e:
                     logger.error(f"Failed to report now playing status")
+                if self.art_path:
+                    try:
+                        Image.open(request.urlopen(player_obj.artUrl)).save(self.art_path)
+                    except ValueError:
+                        logger.debug("The file specified at " + str(self.art_path) + " was insufficient to determine album art image format. Please specify an extension.")
+                    except OSError as e:
+                        logger.debug("Unable to write the file at " + str(self.art_path) + " (" + e.strerror + ")")
+                    except URLError as e:
+                        logger.debug("Unable to load URL at " player_obj.artUrl + " (" + e.strerror + ")")
+                if self.txt_path:
+                    self.txt_path.write_text(player_obj.artist + " - " + self._fix_title(player_obj.title))
             if player_obj.total_played_time >= min(self.scrobble_time_threshold, int(player_obj.length / 2)) and not player_obj.if_scrobbled:
                 scrobble_list.append(player_obj)
                 player_obj.if_scrobbled = True
