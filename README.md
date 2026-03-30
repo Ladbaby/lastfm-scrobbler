@@ -66,6 +66,15 @@ scrobble_time_threshold: 240
 
 # app's log level
 log_level: DEBUG
+
+# optional path to a directory where the app writes both a text file and album art image
+now_playing_dir: PATH_TO_YOUR_DIRECTORY
+
+# optional path to a text file where the app will write "artist - title" updated when this changes in the player
+now_playing_txt: /home/anathema/.local/share/lastfm-mpris2-scrobbler/nowplaying.txt
+
+# optional path to an image file where the app will save the image fetched from mpris:albumArt as reported by the player
+now_playing_art: /home/anathema/.local/share/lastfm-mpris2-scrobbler/nowplaying.png
 ```
 
 ## Usage

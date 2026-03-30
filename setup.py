@@ -23,6 +23,7 @@ setup(
         "PyYAML",
         "dbus-python",
         "pyxdg",
+        "Pillow",
     ],
     tests_require=["pytest"],
     entry_points={
