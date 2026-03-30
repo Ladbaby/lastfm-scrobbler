@@ -71,10 +71,10 @@ log_level: DEBUG
 now_playing_dir: PATH_TO_YOUR_DIRECTORY
 
 # optional path to a text file where the app will write "artist - title" updated when this changes in the player
-now_playing_txt: /home/anathema/.local/share/lastfm-mpris2-scrobbler/nowplaying.txt
+now_playing_txt: PATH_TO_YOUR_DIRECTORY/example.txt
 
 # optional path to an image file where the app will save the image fetched from mpris:albumArt as reported by the player
-now_playing_art: /home/anathema/.local/share/lastfm-mpris2-scrobbler/nowplaying.png
+now_playing_art: PATH_TO_YOUR_DIRECTORY/example.png
 ```
 
 ## Usage
